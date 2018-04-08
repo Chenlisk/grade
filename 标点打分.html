@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="http://me.52fhy.com/doc/clipboardjs/dist/clipboard.min.js"></script>
+    <!-- <script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js"></script> -->
+    <!-- <script src="https://cdn.bootcss.com/clipboard.js/1.7.1/clipboard.min.js"></script> -->
+
+    <title>标点打分</title>
+
+    <style>
+        body {
+            margin: 0px;
+            min-width: 1350px;
+            font-family: "等线", "微软雅黑", "黑体";
+            background-color: #fcfcfc;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            text-align: center;
+        }
+        
+        h1.header {
+            font-size: 34px;
+            overflow: hidden;
+            /*color: white;*/
+        }
+        
+        #header {
+            font-weight: 400;
+            cursor: default;
+            margin: 0px;
+            padding-bottom: 2px;
+            padding-top: 2px;
+            text-align: left;
+            padding-left: 1%;
+            /* background-color: #3C7BBE; */
+        }
+        
+        #container {
+            width: 96%;
+            margin: 0 auto;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding: 4px;
+            padding-top: 15px;
+            padding-bottom: 10px;
+            border-radius: 8px;
+            text-align: left;
+            background-color: rgba(233, 235, 240, 0.7);
+            /* background-color: fuchsia; */
+        }
+        
+        div.block {
+            padding: 5px;
+            margin: 3px;
+            width: 48%;
+            /* text-align: right; */
+            /* text-align: left; */
+            border-radius: 6px;
+            display: inline-block;
+            /* border: 1px solid gray; */
+            background-color: rgba(225, 225, 230, 0.6);
+            /* background-color: yellow; */
+        }
+        
+        button {
+            font-family: "等线", "微软雅黑", "黑体";
+            border-radius: 5px;
+            /* font-style: bold; */
+            /* color: white; */
+            border: 1px solid gray;
+            font-size: 16px;
+            margin: 0px;
+            /* clear: both; */
+            /* display: block; */
+            float: right;
+            margin-left: 1px;
+            margin-right: 1px;
+            width: 90px;
+            height: 35px;
+            cursor: pointer;
+            background-color: rgba(128, 128, 128, 0.15);
+        }
+        
+        button:hover {
+            background-color: rgba(128, 128, 128, 0.36);
+        }
+        
+        button:active {
+            background-color: rgba(128, 128, 128, 0.7);
+        }
+        
+        textarea {
+            font-family: "等线", "微软雅黑", "黑体";
+            font-size: 18px;
+            background-color: #ffffff;
+            width: 97%;
+            margin: 1%;
+            margin-bottom: 1px;
+            height: 250px;
+            resize: none;
+        }
+        
+        p.tips {
+            font-family: "等线", "微软雅黑", "黑体";
+            text-align: left;
+            margin: 0px;
+            padding: 0px;
+            margin-left: 5px;
+            font-size: 14px;
+            /* background-color: cornflowerblue; */
+        }
+        
+        p.title {
+            font-family: "等线", "微软雅黑", "黑体";
+            text-align: left;
+            font-weight: 500;
+            margin: 0px;
+            padding: 0px;
+            margin: 6px;
+            font-size: 18px;
+            /* background-color: cornflowerblue; */
+        }
+        
+        div.subBlock1 {
+            width: 49%;
+            text-align: right;
+            /* display: inline; */
+            margin-left: 2px;
+            float: left;
+            border-radius: 5px;
+            /* background-color: chartreuse; */
+        }
+        
+        div.subBlock2 {
+            width: 49%;
+            float: left;
+            margin-left: 2px;
+            text-align: right;
+            border-radius: 5px;
+            /* display: inline; */
+            /* background-color: rgb(192, 91, 170); */
+        }
+        
+        div.colume {
+            /* margin: 3px; */
+            padding: 3px;
+            padding-left: 12px;
+            padding-right: 12px;
+            /* padding-top: 3px;
+            padding-bottom: 3px; */
+            border-radius: 4px;
+            /* background-color: aquamarine; */
+        }
+        
+        div.colume span {
+            font-style: italic;
+            cursor: pointer;
+            padding: 3px;
+            border-radius: 4px;
+            /* background-color: rgba(182, 182, 158, 0.103); */
+        }
+        
+        div.colume span:hover {
+            background-color: rgba(128, 128, 128, 0.3);
+        }
+    </style>
+
+    <script>
+        //--------------------------------------------------------------------------------//
+        var URL = "http://192.168.16.232:####/translator/translate";
+        //--------------------------------------------------------------------------------//
+        var wordCount;
+        var dic = {
+            7784: ['receiveText1', 'tips1'],
+            7785: ['receiveText2', 'tips2'],
+            7786: ['receiveText3', 'tips3']
+        };
+        var examples = {
+            exp1: ['問誰造此論。答佛世尊。所以者何。以一切種所知法性甚深微妙。非佛世尊一切智者。誰能究竟等覺開示。若爾此中誰問誰答。或有說者。尊者舍利子問。佛世尊答。復有說者。五百阿羅漢問。佛世尊答。有作是說。諸天神問。佛世尊答。有餘師說。化苾芻問。佛世尊答。所以者何。諸佛法爾所知法性。於諸世間定應開示。然無問者。爾時世尊化作苾芻。形容端正眾所樂見。剃除鬚髮服僧伽胝。令彼請問佛世尊答。猶如徵問義品因緣。', '問+誰造此論+答+佛世尊+所以者何+以一切種*所知法性*甚深微妙+非佛世尊*一切智者+誰能究竟等覺開示+若爾*此中誰問*誰答+或有說者*尊者舍利子問*佛世尊答+復有說者*五百阿羅漢問*佛世尊答+有作是說*諸天神問*佛世尊答+有餘師說*化苾芻問*佛世尊答+所以者何+諸佛法爾*所知法性*於諸世間*定應開示+然無問者+爾時*世尊化作苾芻+形容端正*眾所樂見+剃除鬚髮*服僧伽胝+令彼請問*佛世尊答+猶如徵問義品因緣+']
+        };
+        var stdAnwser = '問+誰造此論+答+佛世尊+所以者何+以一切種*所知法性*甚深微妙+非佛世尊*一切智者+誰能究竟等覺開示+若爾*此中誰問*誰答+或有說者*尊者舍利子問*佛世尊答+復有說者*五百阿羅漢問*佛世尊答+有作是說*諸天神問*佛世尊答+有餘師說*化苾芻問*佛世尊答+所以者何+諸佛法爾*所知法性*於諸世間*定應開示+然無問者+爾時*世尊化作苾芻+形容端正*眾所樂見+剃除鬚髮*服僧伽胝+令彼請問*佛世尊答+猶如徵問義品因緣+'
+        var origenText = '問誰造此論。答佛世尊。所以者何。以一切種所知法性甚深微妙。非佛世尊一切智者。誰能究竟等覺開示。若爾此中誰問誰答。或有說者。尊者舍利子問。佛世尊答。復有說者。五百阿羅漢問。佛世尊答。有作是說。諸天神問。佛世尊答。有餘師說。化苾芻問。佛世尊答。所以者何。諸佛法爾所知法性。於諸世間定應開示。然無問者。爾時世尊化作苾芻。形容端正眾所樂見。剃除鬚髮服僧伽胝。令彼請問佛世尊答。猶如徵問義品因緣。';
+        var precessedText = '';
+        //--------------------------------------------------------------------------------//
+
+
+        var remPunc = function() {
+            if (getE("preText").value === '')
+                return;
+            if (getE("stdText").value === "") {
+                alert("Please offer a standard anwser!")
+                return;
+            }
+            origenText = getE("preText").value;
+            stdAnwser = getE("stdText").value;
+            precessedText = remove(origenText);
+            if (precessedText != remove(stdAnwser)) {
+                alert('文本不匹配！')
+                    // alert(precessedText, '\n', remove(stdAnwser))
+                return;
+            }
+
+            if (precessedText === "")
+                getE("preText").value = precessedText;
+            console.log('precessedText', precessedText)
+
+            var txt = ''
+            txt += "字数:" + precessedText.length + " ";
+            txt += "标点数:" + (origenText.length - precessedText.length) + " ";
+            txt += "得分:" + Hlight(grade(origenText, stdAnwser)) + " ";
+            getE("tips01").innerHTML = txt;
+        }
+
+        var remove = function(s) {
+            s = s.replace(/([\n-']|[*-Z]|[\^-~])/g, '');
+            s = s.replace(/[　-〟]/g, '');
+            s = s.replace(/[‐-ⁿ]/g, '');
+            s = s.replace(/[！-･]/g, '');
+            s = s.replace(/(（）|〔〕|\(\)|\[\]|\\|·|￥)/g, '');
+            return s;
+        }
+
+        var send = function(line) {
+                var txt = precessedText;
+
+                if (getE("stdText").value === '') {
+                    alert("Please input the text!")
+                    return;
+                }
+                if (txt === "") {
+                    alert("Please preprocess the text!")
+                    return;
+                }
+                if (txt != remove(stdAnwser)) {
+                    alert('文本不匹配！')
+                    return;
+                }
+                if (getE("stdText").value === "") {
+                    alert("Please offer a standard anwser!")
+                    return;
+                }
+
+                stdAnwser = getE("stdText").value
+                postText(txt, line);
+            }
+            //----------------------------------------------------------------------------//
+        var clipboard;
+        window.onload = function() {
+            getE("preText").value = origenText;
+            getE("stdText").value = stdAnwser;
+
+            clipboard1 = new Clipboard('#copy1');
+            clipboard2 = new Clipboard('#copy2');
+            clipboard3 = new Clipboard('#copy3');
+        }
+
+        var getE = function(e) {
+            return document.getElementById(e);
+        }
+
+        var postText = function(ptx, line) {
+            var xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var str = xhr.responseText;
+                    str = str.substring(3, str.length - 3);
+                    line = xhr.responseURL
+                    var txt = line.search(/:\d\d\d\d\//);
+                    txt = line.substring(txt + 1, txt + 5)
+                        // alert(txt)
+                    var text = ''
+                    var score = grade(str, stdAnwser);
+                    lstr = str.length === 0 ? "" : str.length;
+                    text += "字数:" + wordCount + '  ';
+                    text += "标点数:" + (lstr - wordCount) + '  ';
+                    text += "得分:" + Hlight(score) + '  ';
+
+                    var atext = dic[txt][0]
+                    var atip = dic[txt][1]
+                    getE(atext).value = str;
+                    getE(atip).innerHTML = text;
+                }
+            }
+
+            line = URL.replace('####', line)
+            xhr.open("POST", line, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            var data = JSON.stringify([{
+                "src": ptx
+            }]);
+            xhr.send(data);
+        }
+
+        var grade = function(awr, std) {
+            //|位置 |有标点|无标点|  
+            //| +     |    1            0
+            //| *     |    1           0.5
+            //| 空白|    0            1
+            var score = 0;
+            awr = awr.replace(/(，|。|、|：|！|《|》|（|）|；|“|”|-|·|？)/g, '#');
+            std = std.replace(/\*/g, '#*').replace(/\+/g, '#+');
+
+            awrMap = [];
+            stdMap = [];
+
+            while (awr.indexOf('#') != -1) {
+                awrMap.push(awr.indexOf('#'));
+                awr = awr.replace('#', '');
+            }
+            while (std.indexOf('#') != -1) {
+                stdMap.push([std.indexOf('#'), std[std.indexOf('#') + 1]]);
+                std = std.replace(/#[*+]/, '');
+            }
+            wordCount = awr.length;
+
+            console.log('awr:', awrMap);
+            console.log('std:', stdMap);
+            var score = 0;
+            var tip = 0;
+            for (var i = 0; i < stdMap.length; i++) {
+                s = stdMap[i][0];
+                t = stdMap[i][1];
+                for (var j = 0; j < awrMap.length; j++) {
+                    a = awrMap[j];
+                    if (s === a) {
+                        score += 1;
+                        awrMap[j] = '';
+                        stdMap[i][0] = '';
+                        stdMap[i][0] = '';
+                        break;
+                    }
+                }
+            }
+            console.log('awr:', awrMap);
+            console.log('std:', stdMap);
+            console.log(score);
+            score += (wordCount - stdMap.length);
+
+            for (var i = 0; i < stdMap.length; i++) {
+                s = stdMap[i][0];
+                t = stdMap[i][1];
+                if (s != "") {
+                    if (t === '*')
+                        score += 0.5;
+                }
+            }
+            console.log(score, wordCount);
+            score = parseInt(score * 1000 / wordCount) / 10 + '%'
+            if (wordCount == 0) {
+                score = '0'
+            }
+            console.log(score);
+            return score;
+        }
+
+        var Hlight = function(str) {
+                return '<span style="color:red">' + str + '</span>'
+            }
+            //-----------------------------------------------------------------------------//
+    </script>
+</head>
+
+<body>
+    <div id="container">
+        <h1 id="header">标点打分</h1>
+        <div class='colume'>
+            <span>示例文本1</span>
+            <span>示例文本2</span>
+            <span>示例文本3</span>
+            <span>示例文本4</span>
+            <span>示例文本5</span>
+        </div>
+
+        <div class='block'>
+            <div class='subBlock1'>
+                <p class='title'>待处理文本</p>
+            </div>
+            <div class='subBlock2'>
+                <button id="remPunc" onclick="remPunc()">预处理</button>
+            </div>
+            <textarea id="preText" class="text" maxlength="65535" placeholder="粘贴文本到这里" onchange=""></textarea>
+            <p class="tips" id="tips01">　</p>
+        </div>
+
+        <div class='block'>
+            <div class='subBlock1'>
+                <p class='title'>标准答案</p>
+            </div>
+            <div class='subBlock2'>
+                <button id="copy1" class='copys' data-clipboard-target="#receiveText1" style='visibility:hidden'>复制</button>
+            </div>
+            <textarea id="stdText" class="text" maxlength="65535" placeholder="粘贴文本到这里" onchange=""></textarea>
+            <p class="tips" id="tips02">　</p>
+        </div>
+
+        <div class='block'>
+            <div class='subBlock1'>
+                <p class='title'>端口:7784</p>
+            </div>
+            <div class='subBlock2'>
+                <button id="send1" class='sends' onclick="send(7784)">发送</button>
+                <button id="copy1" class='copys' data-clipboard-target="#receiveText1">复制</button>
+            </div>
+            <textarea id="receiveText1" readonly="readonly"></textarea>
+            <p class="tips" id="tips1">　</p>
+        </div>
+
+        <div class='block'>
+            <div class='subBlock1'>
+                <p class='title'>端口:7785</p>
+            </div>
+            <div class='subBlock2'>
+                <button id="send2" class='sends' onclick="send(7785)">发送</button>
+                <button id="copy2" class='copys' data-clipboard-target="#receiveText2">复制</button>
+            </div>
+            <textarea id="receiveText2" readonly="readonly"></textarea>
+            <p class="tips" id="tips2">　</p>
+        </div>
+
+        <div class='block'>
+            <div class='subBlock1'>
+                <p class='title'>端口:7786</p>
+            </div>
+            <div class='subBlock2'>
+                <button id="send3" class='sends' onclick="send(7786)">发送</button>
+                <button id="copy3" class='copys' data-clipboard-target="#receiveText3">复制</button>
+            </div>
+            <textarea id="receiveText3" readonly="readonly"></textarea>
+            <p class="tips" id="tips3">　</p>
+        </div>
+    </div>
+</body>
+
+</html>
